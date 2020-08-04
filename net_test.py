@@ -4,7 +4,7 @@ from influxdb import InfluxDBClient
 INFLUX_DB_IP = '192.168.1.10'
 
 
-def net_test(host, ssid, ap_info):
+def net_test(host, port, interval, ssid, ap_info):
     clientDB = InfluxDBClient(INFLUX_DB_IP, 8086, 'network_logger', 'gowifi!', 'network_benchmark')
 
 
@@ -13,14 +13,15 @@ def net_test(host, ssid, ap_info):
         client = iperf3.Client()
         client.duration = 5
         client.server_hostname = host
-        client.port = 5201
+        client.port = port
         # result = client.run()
         try:
             result = client.run()
         except Exception as ex:
             print (ex)
 
-            time.sleep(10)
+            del(client)
+            time.sleep(interval)
             continue
         try:
             sent = result.sent_Mbps 
@@ -39,15 +40,17 @@ def net_test(host, ssid, ap_info):
         print (influx_data)
 
         clientDB.write_points([influx_data])
-        time.sleep(10)
+        time.sleep(interval)
 
 
 def main(argv):
     host_ip = '192.168.1.10'
     ssid = 'unknown'
     ap_info = 'unknown'
+    port = 5201
+    interval = 10
     try:
-        opts, args = getopt.getopt(argv,"hs:o:a:",["ssid=","output_host=","ap_info="])
+        opts, args = getopt.getopt(argv,"hs:o:a:p:i:",["ssid=","output_host=","ap_info=","port=", "interval="])
     except getopt.GetoptError:
         print ('test.py -i <inputfile> -o <outputfile>')
         sys.exit(2)
@@ -61,9 +64,13 @@ def main(argv):
             host_ip = arg
         elif opt in ("-a", "--ap_info"):
             ap_info = arg
+        elif opt in ("-p", "--port"):
+            port = int(arg)
+        elif opt in ("-i", "--interval"):
+            interval = int(arg)
             
     
-    net_test(host_ip, ssid, ap_info)
+    net_test(host_ip, port, interval, ssid, ap_info)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
