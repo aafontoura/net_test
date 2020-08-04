@@ -1,0 +1,11 @@
+[Unit]
+Description=Check net connection performance
+After=network.target
+[Service]
+Type=simple
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/net_test/net_test.py
+Restart=always
+RestartSec=5s
+[Install]
+WantedBy=default.target
