@@ -4,7 +4,7 @@ After=network.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/usr/bin/python3 /home/pi/net_test/net_test.py -o 192.168.1.10 -s internacional -a tp_link
+ExecStart=/usr/bin/python3 /home/pi/net_test/net_test.py -o 192.168.1.10 -p 5201 -i 10 -s internacional -a tp_link
 Restart=always
 RestartSec=5s
 [Install]
